@@ -93,9 +93,12 @@ def clean_zillow_data(df):
     
     # Drop rows with null values since it is only a small portion of the dataframe 
     df = df.dropna()
+
+    # create age column based on yearbuilt
+    df['age'] = 2021 - df.yearbuilt
     
     # Create list of datatypes I want to change
-    int_col_list = ['bedrooms','area','taxvalue']
+    int_col_list = ['bedrooms','area','taxvalue','age']
     obj_col_list = ['yearbuilt','fips']
     
     # Change data types where it makes sense
@@ -107,6 +110,10 @@ def clean_zillow_data(df):
     
     # drop taxamount since we will be predicting tax value and tax amount is considered data leakage
     df = df.drop(columns='taxamount')
+
+    # Encode FIPS column and concatenate onto original dataframe
+    dummy_df = pd.get_dummies(df['fips'], drop_first=True)
+    df = pd.concat([df, dummy_df], axis=1)
     
     return df
 
